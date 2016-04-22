@@ -1,0 +1,106 @@
+<?xml version="1.0"  encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:util="http://www.springframework.org/schema/util"	
+	xmlns:cache="http://www.springframework.org/schema/cache"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans	http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+				http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.0.xsd
+                http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd
+                http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache-4.0.xsd
+                http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd">
+
+	<!-- XML转码器 -->
+	<bean id="fmXmlEscape" class="freemarker.template.utility.XmlEscape" />
+	
+	<!-- 配置freeMarker的模板路径 -->
+	<bean id="freemarkerConfig" class="org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer">
+		<property name="templateLoaderPath" value="/WEB-INF/ftl/" />
+		<property name="freemarkerVariables">
+			<map>
+				<entry key="xml_escape" value-ref="fmXmlEscape" />
+			</map>
+		</property>
+		<property name="freemarkerSettings">
+			<props>
+				<!-- <prop key="datetime_format">MM/dd/yyyy</prop> <prop key="number_format">0.######</prop> -->
+				<prop key="defaultEncoding">UTF-8</prop>
+				<!-- <prop key="template_update_delay">0</prop> -->
+				<prop key="template_exception_handler">ignore</prop>
+				<prop key="number_format">0.##</prop>
+			</props>
+		</property>
+	</bean>
+	
+	<!-- 配置freeMarker视图解析器 -->
+	<bean id="freeMarkerViewResolver" class="org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver">
+		<property name="viewClass" value="org.springframework.web.servlet.view.freemarker.FreeMarkerView" />
+		<property name="contentType" value="text/html;charset=UTF-8" />
+		<property name="suffix" value=".ftl" />
+		<property name="order" value="0"/>
+		<property name="prefix" value="/" />
+		
+		<property name="requestContextAttribute" value="rc" />
+		<property name="exposeRequestAttributes" value="true" />
+		<property name="exposeSpringMacroHelpers" value="true" />
+	</bean>
+	
+	<!-- jsp视图解析器 -->  
+	<bean id="jstlViewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="viewClass" value="org.springframework.web.servlet.view.JstlView" />
+		<property name="prefix" value="/WEB-INF/ftl/" />
+		<property name="suffix" value=".jsp" />
+		<property name="order" value="2" />
+	</bean>
+
+	<!-- 扫描控制器类 -->
+	<context:component-scan base-package="com.shhxzq.fin.be.cplocate" />
+
+	<!-- 采用注解方式配置MVC -->
+	<mvc:annotation-driven content-negotiation-manager="contentNegotiationManager">
+	    <mvc:message-converters>
+	    	<bean class="org.springframework.http.converter.StringHttpMessageConverter">
+                <constructor-arg value="UTF-8" />
+            </bean>
+	        <bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+	            <!-- <property name="objectMapper" ref="jackson2ObjectMapperFactoryBean" />  -->
+	            <property name="objectMapper">  
+                    <bean class="com.fasterxml.jackson.databind.ObjectMapper">  
+                        <property name="dateFormat">  
+                            <bean class="java.text.SimpleDateFormat">  
+                                <constructor-arg type="java.lang.String" value="yyyy-MM-dd HH:mm:ss" />  
+                            </bean>  
+                        </property>  
+                    </bean>  
+                </property>
+	            <property name="supportedMediaTypes">  
+                    <list>  
+	                    <value>text/plain;charset=utf-8</value>
+	                    <value>html/text;charset=utf-8</value>
+		                <value>text/html;charset=utf-8</value>
+		                <value>text/json;charset=utf-8</value>
+		                <value>application/json;charset=utf-8</value>
+                    </list>  
+                 </property> 
+	        </bean>     
+	    </mvc:message-converters>
+	</mvc:annotation-driven>
+	
+	<!-- Supporty medieType Content Manager Config-->
+	<bean id="contentNegotiationManager" class="org.springframework.web.accept.ContentNegotiationManagerFactoryBean">
+		<property name="favorPathExtension" value="false" />
+	    <property name="favorParameter" value="true" />
+		<property name="mediaTypes">
+			<value>
+				atom=application/atom+xml
+				html=text/html
+				json=application/json
+				xml=application/xml
+				*=*/*
+			</value>
+		</property>
+	</bean>
+	
+</beans>
