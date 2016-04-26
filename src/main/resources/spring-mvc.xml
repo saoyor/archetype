@@ -73,7 +73,7 @@
                 <prop key="date_format">yyyy-MM-dd</prop>
                 <prop key="number_format">#.##</prop>
                 <prop key="whitespace_stripping">true</prop>
-                <prop key="auto_import">common.ftl as c</prop>
+                <prop key="auto_import">spring.ftl as spring, common.ftl as c</prop>
             </props>
         </property>
         <property name="freemarkerVariables">

@@ -208,6 +208,8 @@
         <log4j.version>1.2.16</log4j.version>
         <mysql-connector-java.version>5.1.9</mysql-connector-java.version>
         <commons-dbcp.version>1.4</commons-dbcp.version>
+        <buildNumber>${maven.build.timestamp}</buildNumber>
+        <copyright.year>2016</copyright.year>
     </properties>
 
 </project>
