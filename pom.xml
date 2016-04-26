@@ -94,6 +94,7 @@
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
             <version>${servlet-api.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>javax.servlet.jsp</groupId>
@@ -177,7 +178,7 @@
                 <artifactId>tomcat7-maven-plugin</artifactId>
                 <version>${tomcat-plugin-version}</version>
                 <configuration>
-                    <port>8888</port>
+                    <port>8088</port>
                     <path>/</path>
                     <uriEncoding>${encoding}</uriEncoding>
                 </configuration>

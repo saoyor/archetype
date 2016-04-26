@@ -1,106 +1,96 @@
-<?xml version="1.0"  encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-	xmlns:context="http://www.springframework.org/schema/context"
-	xmlns:p="http://www.springframework.org/schema/p"
-	xmlns:mvc="http://www.springframework.org/schema/mvc"
-	xmlns:util="http://www.springframework.org/schema/util"	
-	xmlns:cache="http://www.springframework.org/schema/cache"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans	http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
-				http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.0.xsd
-                http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd
-                http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache-4.0.xsd
-                http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd">
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+      http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+      http://www.springframework.org/schema/context
+      http://www.springframework.org/schema/context/spring-context.xsd
+      http://www.springframework.org/schema/mvc
+      http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd">
 
-	<!-- XML转码器 -->
-	<bean id="fmXmlEscape" class="freemarker.template.utility.XmlEscape" />
-	
-	<!-- 配置freeMarker的模板路径 -->
-	<bean id="freemarkerConfig" class="org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer">
-		<property name="templateLoaderPath" value="/WEB-INF/ftl/" />
-		<property name="freemarkerVariables">
-			<map>
-				<entry key="xml_escape" value-ref="fmXmlEscape" />
-			</map>
-		</property>
-		<property name="freemarkerSettings">
-			<props>
-				<!-- <prop key="datetime_format">MM/dd/yyyy</prop> <prop key="number_format">0.######</prop> -->
-				<prop key="defaultEncoding">UTF-8</prop>
-				<!-- <prop key="template_update_delay">0</prop> -->
-				<prop key="template_exception_handler">ignore</prop>
-				<prop key="number_format">0.##</prop>
-			</props>
-		</property>
-	</bean>
-	
-	<!-- 配置freeMarker视图解析器 -->
-	<bean id="freeMarkerViewResolver" class="org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver">
-		<property name="viewClass" value="org.springframework.web.servlet.view.freemarker.FreeMarkerView" />
-		<property name="contentType" value="text/html;charset=UTF-8" />
-		<property name="suffix" value=".ftl" />
-		<property name="order" value="0"/>
-		<property name="prefix" value="/" />
-		
-		<property name="requestContextAttribute" value="rc" />
-		<property name="exposeRequestAttributes" value="true" />
-		<property name="exposeSpringMacroHelpers" value="true" />
-	</bean>
-	
-	<!-- jsp视图解析器 -->  
-	<bean id="jstlViewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
-		<property name="viewClass" value="org.springframework.web.servlet.view.JstlView" />
-		<property name="prefix" value="/WEB-INF/ftl/" />
-		<property name="suffix" value=".jsp" />
-		<property name="order" value="2" />
-	</bean>
+    <!-- 启动注解驱动的Spring MVC功能，注册请求url和注解POJO类方法的映射-->
+    <mvc:annotation-driven/>
 
-	<!-- 扫描控制器类 -->
-	<context:component-scan base-package="com.shhxzq.fin.be.cplocate" />
+    <!-- 自动扫描controller -->
+    <context:component-scan base-package="com.kangyonggan.controller"/>
 
-	<!-- 采用注解方式配置MVC -->
-	<mvc:annotation-driven content-negotiation-manager="contentNegotiationManager">
-	    <mvc:message-converters>
-	    	<bean class="org.springframework.http.converter.StringHttpMessageConverter">
-                <constructor-arg value="UTF-8" />
-            </bean>
-	        <bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
-	            <!-- <property name="objectMapper" ref="jackson2ObjectMapperFactoryBean" />  -->
-	            <property name="objectMapper">  
-                    <bean class="com.fasterxml.jackson.databind.ObjectMapper">  
-                        <property name="dateFormat">  
-                            <bean class="java.text.SimpleDateFormat">  
-                                <constructor-arg type="java.lang.String" value="yyyy-MM-dd HH:mm:ss" />  
-                            </bean>  
-                        </property>  
-                    </bean>  
-                </property>
-	            <property name="supportedMediaTypes">  
-                    <list>  
-	                    <value>text/plain;charset=utf-8</value>
-	                    <value>html/text;charset=utf-8</value>
-		                <value>text/html;charset=utf-8</value>
-		                <value>text/json;charset=utf-8</value>
-		                <value>application/json;charset=utf-8</value>
-                    </list>  
-                 </property> 
-	        </bean>     
-	    </mvc:message-converters>
-	</mvc:annotation-driven>
-	
-	<!-- Supporty medieType Content Manager Config-->
-	<bean id="contentNegotiationManager" class="org.springframework.web.accept.ContentNegotiationManagerFactoryBean">
-		<property name="favorPathExtension" value="false" />
-	    <property name="favorParameter" value="true" />
-		<property name="mediaTypes">
-			<value>
-				atom=application/atom+xml
-				html=text/html
-				json=application/json
-				xml=application/xml
-				*=*/*
-			</value>
-		</property>
-	</bean>
-	
+    <!--放过/scripts下的静态文件-->
+    <mvc:resources mapping="/static/**" location="/WEB-INF/static/"/>
+
+    <!-- 定义无需Controller的url<->view直接映射 -->
+    <mvc:view-controller path="/403" view-name="/403"/>
+    <mvc:view-controller path="/404" view-name="/404"/>
+    <mvc:view-controller path="/500" view-name="/500"/>
+
+    <bean id="exceptionResolver" class="com.kangyonggan.exception.CustomSimpleMappingExceptionResolver">
+        <property name="exceptionMappings">
+            <props>
+                <prop key="java.lang.Exception">500</prop>
+                <prop key=".ResourceNotFoundException">404</prop>
+                <!--<prop key=".UnauthorizedException">403</prop>-->
+            </props>
+        </property>
+        <!-- 设置日志输出级别，不定义则默认不输出警告等错误日志信息 -->
+        <property name="warnLogCategory" value="WARN"/>
+        <!-- 默认错误页面，当找不到上面mappings中指定的异常对应视图时，使用本默认配置 -->
+        <property name="defaultErrorView" value="500"/>
+        <!-- 默认HTTP状态码 -->
+        <property name="defaultStatusCode" value="500"/>
+    </bean>
+
+    <!-- 配置 FreeMarker视图解析器 -->
+    <bean id="viewResolver"
+          class="org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver">
+        <property name="viewClass"
+                  value="org.springframework.web.servlet.view.freemarker.FreeMarkerView"/>
+        <property name="cache" value="true"/>
+        <property name="prefix" value=""/>
+        <property name="suffix" value=".ftl"/>
+        <property name="contentType" value="text/html;charset=utf-8"/>
+        <property name="requestContextAttribute" value="rca"/>
+        <property name="exposeRequestAttributes" value="true"/>
+        <property name="exposeSessionAttributes" value="true"/>
+        <property name="exposeSpringMacroHelpers" value="true"/>
+    </bean>
+
+    <!-- FreeMarker的配置 -->
+    <bean id="freeMarkerConfigurer"
+          class="org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer">
+        <property name="templateLoaderPaths" value="/WEB-INF/templates/"/>
+        <property name="defaultEncoding" value="UTF-8"/>
+        <!--<property name="preferFileSystemAccess" value="false" />-->
+        <property name="freemarkerSettings">
+            <props>
+                <prop key="template_update_delay">10</prop>
+                <prop key="defaultEncoding">UTF-8</prop>
+                <prop key="url_escaping_charset">UTF-8</prop>
+                <prop key="locale">zh_CN</prop>
+                <prop key="boolean_format">true,false</prop>
+                <prop key="time_format">HH:mm:ss</prop>
+                <prop key="datetime_format">yyyy-MM-dd HH:mm:ss</prop>
+                <prop key="date_format">yyyy-MM-dd</prop>
+                <prop key="number_format">#.##</prop>
+                <prop key="whitespace_stripping">true</prop>
+                <prop key="auto_import">common.ftl as c</prop>
+            </props>
+        </property>
+        <property name="freemarkerVariables">
+            <map>
+                <entry key="block" value-ref="blockDirective"/>
+                <entry key="extends" value-ref="extendsDirective"/>
+                <entry key="override" value-ref="overrideDirective"/>
+                <entry key="super" value-ref="superDirective"/>
+                <!--<entry key="cms_admin_menu" value-ref="adminMenusDirective"/>-->
+                <!--<entry key="cms_dashboard_menu" value-ref="dashboardMenusDirective"/>-->
+                <!--<entry key="cms_user" value-ref="userDirective"/>-->
+                <!--<entry key="cms_user_nocache" value-ref="userNoCacheDirective"/>-->
+                <!--<entry key="cms_navigation" value-ref="navigationDirective"/>-->
+                <!--<entry key="cms_setting" value-ref="settingDirective"/>-->
+                <!--<entry key="cms_user_sms_isopen" value-ref="userSmsIsOpenDirective"/>-->
+            </map>
+        </property>
+    </bean>
+
 </beans>
